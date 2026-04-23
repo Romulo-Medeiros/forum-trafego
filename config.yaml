@@ -1,0 +1,117 @@
+# forum-trafego — Paid Traffic Squad (Lean Edition)
+# Condensed clone of trafego-pago v6.0 — optimized for speed, minimal surface area.
+
+pack:
+  name: forum-trafego
+  title: "Fórum Tráfego — Lean Paid Traffic Squad"
+  version: "1.0.0"
+  author: "Romulo Medeiros"
+  description: >-
+    Lean paid-traffic squad derived from trafego-pago v6. 5 agents, 6 tasks,
+    2 workflows. Multi-client, multi-platform (Meta + Google). End-to-end
+    tracking via GTM. Safety-first: PAUSED-by-default launches, pre-push
+    security audits, self-critique gates.
+  icon: "🚀"
+  slash_prefix: "forumTrafego"
+
+squad:
+  name: forum-trafego
+  version: 1.0.0
+  short-title: "Fórum Tráfego"
+  description: >-
+    Paid-traffic squad for agencies. Optimized for fast onboarding and
+    daily operation. No mind-cloning, no skill libraries — only what you
+    need to launch, track, and optimize.
+  author: Romulo Medeiros
+  icon: "🚀"
+  entry_agent: maestro
+  slashPrefix: forumTrafego
+
+tested: false
+
+independence: false
+independence_details: |
+  Requires Meta Ads + Google Ads API credentials for execution.
+  Read-only mode works without tokens. Bootstrap via *client-onboarding.
+
+environment:
+  required:
+    - name: META_ADS_ACCESS_TOKEN
+      description: "Meta System User token"
+    - name: META_ADS_ACCOUNT_ID
+      description: "Meta Ad Account ID (act_XXXXXXXXX)"
+  optional:
+    - name: GOOGLE_ADS_DEVELOPER_TOKEN
+    - name: GOOGLE_ADS_CLIENT_ID
+    - name: GOOGLE_ADS_CLIENT_SECRET
+    - name: GOOGLE_ADS_REFRESH_TOKEN
+    - name: META_ADS_PIXEL_ID
+
+entry_agent: maestro
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# AGENTS (5) — condensed from 11 in trafego-pago
+# ═══════════════════════════════════════════════════════════════════════════════
+agents:
+  - maestro   # Orchestrator — routing, funnel selection, budget allocation
+  - meta      # Meta Ads specialist (+ TikTok patterns)
+  - google    # Google Ads specialist (Search, Shopping, PMax, YT)
+  - criat     # Creative + copy generator (merges @hook + @criat)
+  - tracker   # GTM, Pixel/CAPI, UTM, end-to-end tracking (exclusive)
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TASKS (6) — core lifecycle only
+# ═══════════════════════════════════════════════════════════════════════════════
+tasks:
+  - client-onboarding
+  - create-media-plan
+  - setup-tracking
+  - daily-check
+  - optimize-campaign
+  - weekly-report
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# WORKFLOWS (2) — the only ones agencies run weekly
+# ═══════════════════════════════════════════════════════════════════════════════
+workflows:
+  - wf-new-campaign       # full onboarding → media plan → tracking → launch
+  - wf-daily-optimization # daily check → diagnose → act → handoff
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CHECKLISTS (3) — go/no-go gates
+# ═══════════════════════════════════════════════════════════════════════════════
+checklists:
+  - pre-launch-checklist
+  - tracking-setup-checklist
+  - weekly-review-checklist
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DATA REGISTRIES (2) — only what's used daily
+# ═══════════════════════════════════════════════════════════════════════════════
+data:
+  - utm-convention
+  - niche-benchmarks
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SAFETY
+# ═══════════════════════════════════════════════════════════════════════════════
+safety:
+  paused_by_default: true
+  autonomy_tiers:
+    auto:    ["Read metrics", "Generate reports", "Detect anomalies"]
+    hitl:    ["Pause underperforming ad", "Scale budget ≤20%", "New audience test"]
+    human:   ["Activate PAUSED campaign", "Budget >20% reallocation", "Kill switch"]
+  emq_gate: 6.0
+  pre_push_audit: true
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# OUTPUT GOVERNANCE
+# ═══════════════════════════════════════════════════════════════════════════════
+settings:
+  output:
+    base_path: "outputs/{client}/"
+    campaigns: "outputs/{client}/campaigns/"
+    reports: "outputs/{client}/reports/"
+    rule: "NEVER write outputs inside agents/, tasks/, workflows/."
+
+tags: [ads, paid-traffic, agency, meta-ads, google-ads, tracking, gtm, lean]

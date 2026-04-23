@@ -1,0 +1,104 @@
+# Workflow: wf-daily-optimization
+# Daily loop: read → diagnose → act → handoff
+# Condensed from trafego-pago wf-daily-optimization.yaml (724 lines → ~140)
+
+workflow:
+  id: wf-daily-optimization
+  name: "Daily optimization loop"
+  version: "1.0"
+  orchestrator: maestro
+  description: >-
+    Once per day per client per channel. Reads metrics, diagnoses anomalies,
+    applies auto-tier fixes, routes HITL decisions.
+
+cadence: "1x / day / client / channel"
+typical_duration: "15-30 min per channel per client"
+
+inputs_required:
+  - campaign_list (live)
+  - yesterday_snapshot
+  - 3d_avg
+  - targets (CPA/CPL/ROAS)
+
+success_criteria:
+  - "Every live campaign assessed"
+  - "Anomalies have root-cause hypothesis"
+  - "Auto-tier actions executed"
+  - "HITL decisions staged with @maestro"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PHASES
+# ═══════════════════════════════════════════════════════════════════════════════
+phases:
+
+  - id: P1
+    name: "Per-channel check"
+    parallel_tracks:
+      - track: meta
+        agent: meta
+        task: daily-check
+        scope: "all active Meta campaigns for client"
+      - track: google
+        agent: google
+        task: daily-check
+        scope: "all active Google campaigns for client"
+    checkpoint:
+      criteria:
+        - "Every campaign has GREEN/YELLOW/RED status"
+        - "Anomalies have hypothesis + suggested action"
+      on_fail: "Request re-check. Do not skip campaigns."
+    handoff_to: [P2]
+
+  - id: P2
+    name: "Auto-tier actions"
+    agents: [meta, google]
+    actions_allowed:
+      - "Pause disapproved ads"
+      - "Add negative keywords from search-term report (Google)"
+      - "Shift budget ≤10% between ad sets within same campaign"
+      - "Apply Meta frequency cap if freq > 3.5"
+    actions_forbidden:
+      - "Budget change > 20% total"
+      - "Kill a campaign with < 7 days data"
+      - "Activate a PAUSED campaign"
+      - "Add audience / kill audience without @maestro"
+    checkpoint:
+      criteria:
+        - "All actions within auto-tier envelope"
+        - "Actions documented in daily log"
+    handoff_to: [P3]
+
+  - id: P3
+    name: "Route flags"
+    owner: maestro
+    inputs: "flags from P1 per track"
+    routing:
+      creative_fatigue: criat
+      tracking_suspect: tracker
+      offer_misfit: maestro
+      audience_saturation: meta
+      budget_shift_needed: maestro
+      kill_or_scale_decision: human
+    checkpoint:
+      criteria:
+        - "Every flag has an owner"
+        - "No flag left in limbo"
+    handoff_to: [DONE]
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ANTI-PATTERNS (never do in daily loop)
+# ═══════════════════════════════════════════════════════════════════════════════
+anti_patterns:
+  - "Scaling on single-day positive: noise, reverts to mean"
+  - "Killing on single-day negative: premature, waste of learnings"
+  - "Adding 10 negatives in one session: audit the search-term report weekly instead"
+  - "Changing creative + audience + bidding in same day: un-attributable"
+  - "Reporting 'everything looks good' without numbers: that's not a check"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# OUTPUT
+# ═══════════════════════════════════════════════════════════════════════════════
+deliverables:
+  - "outputs/{client}/daily-{channel}-{YYYY-MM-DD}.md per channel"
+  - "Flags routed to owners (via Maestro)"
+  - "Auto-tier actions logged with timestamp"

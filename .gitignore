@@ -1,0 +1,42 @@
+## Secrets & env
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+credentials.json
+service-account*.json
+
+## Node / package managers
+node_modules/
+.pnpm-store/
+.yarn/
+.npm/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+## Python (if anything gets added later)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+## OS
+.DS_Store
+Thumbs.db
+
+## IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+## Claude Code runtime
+.claude/cache/
+.claude/logs/
+.claude/hooks.local/
+
+## Ads outputs (client data lives per-client, not in main repo)
+outputs/

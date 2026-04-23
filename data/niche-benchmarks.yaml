@@ -1,0 +1,76 @@
+# Niche Benchmarks — forum-trafego
+# Directional targets. Use as "is this in the ballpark" not "must hit exactly".
+# Update as the squad runs more clients.
+
+benchmarks:
+
+  infoproduto:
+    ticket_range: "R$97 – R$2,997"
+    meta:
+      cpm_range_brl: "18 – 45"
+      ctr_feed: "1.2% – 3.0%"
+      cpl_low_ticket: "R$3 – R$12"   # ticket < R$297
+      cpl_mid_ticket: "R$8 – R$25"   # R$297 – R$997
+      cpa_mid_ticket: "R$80 – R$250"
+      roas_mature: "2.0x – 4.5x"
+    google:
+      search_cpc_range_brl: "R$1.50 – R$6.00"
+      conv_rate_lp: "3% – 8%"
+    typical_funnel: "VSL → checkout OR opt-in → nurture → VSL → checkout"
+    launch_duration_days: "7-14 (cart open 7d)"
+
+  ecommerce:
+    ticket_range: "R$50 – R$800"
+    meta:
+      cpm_range_brl: "15 – 35"
+      ctr_feed: "0.8% – 2.2%"
+      cpa_range: "0.1 – 0.4 × ticket"
+      roas_target: "2.5x – 5.0x"
+    google:
+      shopping_cpc_range: "R$0.50 – R$3.00"
+      pmax_roas_target: "3.0x – 6.0x"
+    typical_funnel: "Ad → product page → AddToCart → Checkout → Purchase"
+    key_metric: "margem por pedido × frequência de compra × 12 meses"
+
+  saas:
+    ticket_range: "R$29/mo – R$999/mo"
+    meta:
+      cpm_range_brl: "30 – 80 (narrow B2B audiences)"
+      ctr_feed: "0.6% – 1.5%"
+      cpl_trial: "R$25 – R$120"
+      trial_to_paid: "8% – 22%"
+    google:
+      search_cpc_range_brl: "R$3 – R$25 (B2B keywords)"
+    typical_funnel: "Ad → LP → free trial signup → nurture → conversion or churn"
+    key_metric: "LTV / CAC ≥ 3.0, payback < 12 meses"
+
+  local_service:
+    ticket_range: "R$80 – R$500 (per service)"
+    meta:
+      cpm_range_brl: "12 – 28 (hyperlocal)"
+      ctr_feed: "1.5% – 4.0% (messenger CTAs lift CTR)"
+      cpl_range: "R$8 – R$30"
+    google:
+      local_cpc_range: "R$1 – R$5"
+      call_tracking_lift: "1.4× – 2.2× vs form-only"
+    typical_funnel: "Ad → LP with WhatsApp CTA → lead → agendamento → atendimento"
+    key_metric: "custo por lead que agendou"
+
+  lancamento_classic:
+    ticket_range: "R$997 – R$4,997"
+    meta:
+      cpm_range_brl: "20 – 50"
+      ctr_feed: "1.0% – 2.8%"
+      cpl_preview: "R$1.50 – R$6.00"     # during opt-in window
+      cpa_sales: "R$300 – R$800"          # during cart open
+      roas_full_campaign: "1.8x – 4.0x"
+    typical_funnel: "Opt-in → CPLs/aulas → abertura-carrinho → carrinho-aberto (7d) → fechamento"
+    launch_window_days: "21-35 (prelaunch + cart + close)"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# NOTES
+# ═══════════════════════════════════════════════════════════════════════════════
+notes:
+  - "Benchmarks drift. Q4 CPMs can be 2× vs Q1 Q2 Q3. Adjust for seasonality."
+  - "Not a SLA. A client 20% outside benchmark may still be profitable — check LTV."
+  - "Use for sanity checks on daily-check, not as target-setting. Targets come from client unit economics."

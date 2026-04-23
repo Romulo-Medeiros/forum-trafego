@@ -1,0 +1,128 @@
+# Workflow: wf-new-campaign
+# End-to-end new-campaign flow: onboarding → plan → tracking → pre-launch → launch (PAUSED)
+# Condensed from trafego-pago wf-new-campaign.yaml (947 lines → ~200)
+
+workflow:
+  id: wf-new-campaign
+  name: "New Campaign (end-to-end)"
+  version: "1.0"
+  orchestrator: maestro
+  description: >-
+    Full flow from client intake to campaign ready-to-launch (PAUSED).
+    Final human action: activate.
+
+inputs_required:
+  - client_summary          # business, ticket, vertical
+  - budget_envelope         # monthly, willing to split by channel
+  - site_access             # GTM admin, LP edit, checkout access
+  - goal                    # revenue, leads, pipeline
+  - legal_consent_context   # LGPD / GDPR / neither
+
+success_criteria:
+  - "All campaigns PAUSED and Shield-validated"
+  - "Tracking EMQ ≥ 6.0 on Purchase, dedup verified"
+  - "Human has signed off on budget, creative, policy"
+  - "Outputs/{client}/ has the full paper trail"
+
+flow_rule: "Unidirectional. Nothing goes back. New cycle = new instance."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PHASES
+# ═══════════════════════════════════════════════════════════════════════════════
+phases:
+
+  - id: P1
+    name: "Onboarding"
+    owner: maestro
+    agents: [maestro]
+    tasks: [client-onboarding]
+    outputs: [persona-sketch, funnel-decision, channel-split, briefs]
+    checkpoint:
+      criteria:
+        - "Persona has 1 specific pain + 1 specific desire"
+        - "Funnel justified by ticket + consciousness + vertical"
+        - "Channel split has rationale (not gut)"
+      on_fail: "Stay in P1. Iterate."
+    handoff_to: [P2]
+
+  - id: P2
+    name: "Parallel specialist work"
+    owner: maestro
+    parallel_tracks:
+      - track: creative
+        agent: criat
+        task: "hooks + video briefs + LP copy"
+        duration: "2-8h"
+      - track: tracking
+        agent: tracker
+        task: setup-tracking
+        duration: "2-6h"
+      - track: media-plan
+        agents: [meta, google]
+        task: create-media-plan
+        duration: "1-2h"
+        blocker: "can start before tracking is GREEN but cannot launch without"
+    checkpoint:
+      criteria:
+        - "Criat delivered: ≥5 hooks, ≥3 video briefs, LP copy if needed"
+        - "Tracker delivered: container live, EMQ ≥6, dedup OK, consent configured"
+        - "Meta and/or Google delivered: media plan with PAUSED campaigns ready"
+      on_fail: "Block next phase. Iterate the failing track."
+    handoff_to: [P3]
+
+  - id: P3
+    name: "Shield gate"
+    owner: maestro
+    agents: [maestro]
+    checklist: pre-launch-checklist
+    inputs: [persona, media-plans, tracking-doc, creative-files]
+    checkpoint:
+      criteria:
+        - "All pre-launch-checklist items GREEN"
+        - "Policy compliance checked (health/finance/housing/etc.)"
+        - "LP verified: copy matches ad, tracking fires, consent respected"
+        - "EMQ ≥ 6.0 documented"
+        - "UTM convention applied"
+        - "Campaigns PAUSED (screenshot in doc)"
+      on_fail: "Fix and re-gate. No 'we'll fix after launch'."
+    handoff_to: [P4]
+
+  - id: P4
+    name: "Human handoff"
+    owner: maestro
+    actors: [human]
+    action: "Human reviews final pack and activates manually."
+    deliverable:
+      path: "outputs/{client}/campaign-ready-{date}.md"
+      contains:
+        - summary
+        - links to PAUSED campaigns
+        - tracking EMQ proof
+        - Shield checklist GREEN
+        - one-line activation instructions
+    checkpoint:
+      criteria:
+        - "Human confirms activation intent"
+        - "Agent does NOT activate automatically"
+      on_fail: "Return to P3 for adjustments."
+    handoff_to: [DONE]
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# VETO CONDITIONS (any phase)
+# ═══════════════════════════════════════════════════════════════════════════════
+vetos:
+  - "Tracker not GREEN → VETO launch, regardless of pressure"
+  - "Shield checklist has any RED → VETO launch"
+  - "Campaign status != PAUSED at handoff → VETO"
+  - "No human sign-off → VETO activation"
+  - "Persona was skipped → VETO start of P2"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TIMELINE (typical)
+# ═══════════════════════════════════════════════════════════════════════════════
+timeline_wall_clock:
+  P1: "30-60 min"
+  P2: "2-8h (parallel, blocked by slowest)"
+  P3: "30-60 min"
+  P4: "async human"
+  total: "~1 day agent + human lead time"

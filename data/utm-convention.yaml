@@ -1,0 +1,92 @@
+# UTM Convention — forum-trafego agency standard
+# Every client inherits this unless an override is explicitly documented.
+
+rules:
+  case: lowercase
+  word_separator: "-"   # hyphen, never underscore, never space
+  encoding: "utf-8, url-safe, no accents (use sem-acento)"
+
+fields:
+  utm_source:
+    description: "Platform the traffic came from"
+    values:
+      - meta        # Facebook + Instagram
+      - google
+      - tiktok
+      - linkedin
+      - email
+      - sms
+      - whatsapp
+      - organic     # only if inbound is retagged for attribution
+
+  utm_medium:
+    description: "Paid type / channel type"
+    values:
+      - cpc
+      - cpm
+      - display
+      - video
+      - social
+      - retargeting
+      - email
+      - push
+
+  utm_campaign:
+    format: "{client}_{offer}_{YYYYMM}"
+    examples:
+      - "ana_infopro_nutricao_202604"
+      - "ecommerce_x_blackfriday_202611"
+    rules:
+      - "client slug = first name or brand shortcode, lowercase"
+      - "offer slug = 2-4 words, hyphens"
+      - "YYYYMM = launch-month or campaign-start-month"
+
+  utm_content:
+    format: "{adset-slug}_{ad-variant}"
+    examples:
+      - "lal1pct_hookpain_v2"
+      - "broadinterest_videoproof_v1"
+    purpose: "Identifies ad set + creative variant so reports can attribute"
+
+  utm_term:
+    description: "Google Search: keyword. Meta: optional — audience tag."
+    examples:
+      - "emagrecimento-sem-dieta"   # Google kw
+      - "lal1-purchasers"             # Meta audience tag
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# FULL EXAMPLES
+# ═══════════════════════════════════════════════════════════════════════════════
+examples:
+
+  - context: "Meta ad, Ana's infoproduct nutrition launch April 2026, interest ad set, pain-hook creative v2"
+    url: "https://ana.com/oferta?utm_source=meta&utm_medium=cpc&utm_campaign=ana_infopro-nutricao_202604&utm_content=interest_hookpain_v2"
+
+  - context: "Google Search ad, ecommerce suplementos, Black Friday"
+    url: "https://supleloja.com/bf?utm_source=google&utm_medium=cpc&utm_campaign=supleloja_blackfriday_202611&utm_term=comprar-whey-protein"
+
+  - context: "TikTok video ad, SaaS trial"
+    url: "https://saasx.io/trial?utm_source=tiktok&utm_medium=video&utm_campaign=saasx_trial_202605&utm_content=ugc_testimonial_v1"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# HOTMART / CHECKOUT REDIRECTS
+# ═══════════════════════════════════════════════════════════════════════════════
+redirect_preservation:
+  rule: "UTMs must survive redirect chains. Verify for every new checkout."
+  known_problems:
+    - platform: "Hotmart pay.hotmart.com"
+      behavior: "Collapses custom query params into 'sck' field"
+      mitigation: "Use Hotmart SCK mapping in link so UTMs land in the Hotmart lead object"
+    - platform: "Bitly / cut.ly / short links"
+      behavior: "Strips UTMs on some plans"
+      mitigation: "Test every short link in private mode before using"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# VIOLATIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+violations_to_catch:
+  - "Uppercase (META, FACEBOOK) — normalize to lowercase"
+  - "Underscores in values — replace with hyphens"
+  - "Spaces — never, url-encode if unavoidable"
+  - "Accents (ção, maçã) — replace with ascii (cao, maca)"
+  - "Missing utm_campaign — must exist on every paid URL"
