@@ -93,6 +93,20 @@ data:
   - niche-benchmarks
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# SKILLS (5) — minimum pack, cloned verbatim from trafego-pago v6
+# ═══════════════════════════════════════════════════════════════════════════════
+skills:
+  meta:
+    - meta-advantage-plus   # invoked by @meta
+  google:
+    - google-pmax           # invoked by @google
+  creative:
+    - creative-testing      # invoked by @criat
+  tracking:
+    - tracking-engagement-events  # invoked by @tracker (EMQ optimization)
+    - hotmart-sck-tracking        # invoked by @tracker (Hotmart checkout bridge)
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # SAFETY
 # ═══════════════════════════════════════════════════════════════════════════════
 safety:
